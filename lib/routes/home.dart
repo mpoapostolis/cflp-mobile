@@ -14,13 +14,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int activeTab = 0;
-  final tabViews = [
-    Store(),
-    Favorite(),
-    Settings(),
-  ];
 
-  void _onItemTapped(int index) {
+  void changeView(int index) {
     setState(() {
       activeTab = index;
     });
@@ -28,13 +23,35 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    PageController pageController = PageController(
+      initialPage: 0,
+      keepPage: true,
+    );
+
+    void bottomTapped(int index) {
+      setState(() {
+        activeTab = index;
+        pageController.animateToPage(index,
+            duration: Duration(milliseconds: 500), curve: Curves.ease);
+      });
+    }
+
     return Container(
       child: Scaffold(
         backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
         appBar: MyAppBar(title: 'home'),
         body: Container(
             decoration: BoxDecoration(color: Color.fromRGBO(84, 95, 116, 1)),
-            child: tabViews[activeTab]),
+            child: PageView(
+                controller: pageController,
+                onPageChanged: (e) {
+                  changeView(e);
+                },
+                children: [
+                  Store(),
+                  Favorite(),
+                  Settings(),
+                ])),
         bottomNavigationBar: Container(
           height: 55.0,
           child: BottomNavigationBar(
@@ -55,7 +72,7 @@ class _HomeState extends State<Home> {
             ],
             currentIndex: activeTab,
             selectedItemColor: Colors.white,
-            onTap: _onItemTapped,
+            onTap: bottomTapped,
           ),
         ),
       ),
